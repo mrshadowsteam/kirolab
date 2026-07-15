@@ -69,6 +69,7 @@ export interface SettingsData {
   minimumWageGrosze: number | null;
   defaultPartnerCode: string | null;
   newsletterPopupCooldownDays: number | null;
+  consultationDescription: PortableTextValue | null;
   consultationPriceGrosze: number | null;
   calcomLink: string | null;
 }

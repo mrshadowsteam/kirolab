@@ -98,7 +98,10 @@ Realizacja przyrostowa według `tasks.md`:
   `/admin` chroniony Supabase Auth (`/admin/login`) z listą leadów, zmianą
   statusu, filtrem i eksportem CSV.
 
+- **Faza 9 — Konsultacje 1:1** ✅ strona `/konsultacje` z opisem oferty i cennikiem
+  z CMS oraz linkiem rezerwacji Cal.com (płatność z góry po stronie Cal.com/Stripe).
+
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
 > Supabase. Konto właściciela panelu tworzy się w Supabase Auth. Kolejny krok:
-> Faza 9 — konsultacje 1:1 (Cal.com + Stripe).
+> Faza 10 — strony prawne, SEO globalne (sitemap/OG), audyt dostępności i wydajności.
