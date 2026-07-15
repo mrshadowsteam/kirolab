@@ -106,8 +106,14 @@ Realizacja przyrostowa według `tasks.md`:
   `sitemap.xml` (trasy statyczne + artykuły + produkty), `robots.txt` (blokada
   `/admin`, `/studio`, `/api`, linków pobrań), `theme-color`. Dostępność (WCAG AA)
   i wydajność (SSG/ISR, `next/image`, dynamiczne ładowanie) wbudowane od Fazy 0.
+- **Faza 11 — RODO i wdrożenie** ✅ przewodnik [`DEPLOYMENT.md`](DEPLOYMENT.md)
+  (konfiguracja usług, `db:push`, buckety, webhooki, lista kontrolna), operacyjne
+  RODO (zgody z czasem/źródłem, prawa osób, region UE, HTTPS), `viewport`/theme-color.
 
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
-> rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
-> Supabase. Konto właściciela panelu tworzy się w Supabase Auth. Kolejny krok:
-> Faza 11 — finalizacja RODO i wdrożenie na Vercel.
+> rejestr npm). Wdrożenie krok po kroku: patrz `DEPLOYMENT.md`.
+
+## Wszystkie fazy ukończone ✅
+
+Implementacja MVP zgodna ze specyfikacją (`.kiro/specs/smart-obywatel`) jest
+kompletna. Aby uruchomić produkcyjnie, wykonaj kroki z `DEPLOYMENT.md`.
