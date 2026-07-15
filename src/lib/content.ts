@@ -5,10 +5,12 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlForImage } from "@/sanity/lib/image";
 import { isSanityConfigured } from "@/sanity/env";
 import {
+  allSlugsForSitemapQuery,
   articleBySlugQuery,
   articlesByPillarQuery,
   featuredProductsQuery,
   latestArticlesQuery,
+  legalPageQuery,
   productBySlugQuery,
   productsQuery,
   settingsQuery,
@@ -16,9 +18,11 @@ import {
 import type {
   ArticleCardData,
   ArticleData,
+  LegalPageData,
   ProductCardData,
   ProductData,
   SettingsData,
+  SitemapData,
 } from "@/lib/content-types";
 
 /**
@@ -230,4 +234,36 @@ export const getArticleBySlug = cache(
 
 export async function getSettings(): Promise<SettingsData | null> {
   return safeFetch<SettingsData | null>(settingsQuery, {}, ["settings"], null);
+}
+
+interface RawLegalPage {
+  title: string;
+  body?: unknown;
+  updatedAt?: string | null;
+}
+
+export const getLegalPage = cache(
+  async (slug: string): Promise<LegalPageData | null> => {
+    const raw = await safeFetch<RawLegalPage | null>(
+      legalPageQuery,
+      { slug },
+      ["legalPage"],
+      null,
+    );
+    if (!raw) return null;
+    return {
+      title: raw.title,
+      body: (raw.body ?? []) as unknown as LegalPageData["body"],
+      updatedAt: raw.updatedAt ?? null,
+    };
+  },
+);
+
+export async function getSitemapData(): Promise<SitemapData> {
+  return safeFetch<SitemapData>(
+    allSlugsForSitemapQuery,
+    {},
+    ["article", "product", "legalPage"],
+    { articles: [], products: [], legalPages: [] },
+  );
 }

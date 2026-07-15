@@ -101,7 +101,13 @@ Realizacja przyrostowa według `tasks.md`:
 - **Faza 9 — Konsultacje 1:1** ✅ strona `/konsultacje` z opisem oferty i cennikiem
   z CMS oraz linkiem rezerwacji Cal.com (płatność z góry po stronie Cal.com/Stripe).
 
+- **Faza 10 — Strony prawne i SEO** ✅ strony prawne z CMS (`/polityka-prywatnosci`,
+  `/regulamin-sklepu`, `/regulamin-konsultacji`) z fallbackiem, dynamiczny
+  `sitemap.xml` (trasy statyczne + artykuły + produkty), `robots.txt` (blokada
+  `/admin`, `/studio`, `/api`, linków pobrań), `theme-color`. Dostępność (WCAG AA)
+  i wydajność (SSG/ISR, `next/image`, dynamiczne ładowanie) wbudowane od Fazy 0.
+
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
 > Supabase. Konto właściciela panelu tworzy się w Supabase Auth. Kolejny krok:
-> Faza 10 — strony prawne, SEO globalne (sitemap/OG), audyt dostępności i wydajności.
+> Faza 11 — finalizacja RODO i wdrożenie na Vercel.

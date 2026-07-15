@@ -46,6 +46,25 @@ export interface ArticleData {
   metaDescription: string | null;
 }
 
+/** Strona prawna (CMS). */
+export interface LegalPageData {
+  title: string;
+  body: PortableTextValue;
+  updatedAt: string | null;
+}
+
+/** Dane do sitemap. */
+export interface SitemapData {
+  articles: {
+    slug: string;
+    pillar: string | null;
+    updatedAt: string | null;
+    publishedAt: string | null;
+  }[];
+  products: { slug: string }[];
+  legalPages: { slug: string }[];
+}
+
 /** Pełny produkt (strona sklepu). */
 export interface ProductData {
   _id: string;
