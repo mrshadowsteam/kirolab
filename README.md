@@ -60,6 +60,11 @@ Realizacja przyrostowa według `tasks.md`:
 - **Faza 1 — Sanity** ✅ osadzone Studio (`/studio`), schematy (`pillar`, `author`,
   `article`, `product`, `legalPage`), singleton `settings`, klient + zapytania
   GROQ, webhook rewalidacji ISR.
+- **Faza 2 — Supabase** ✅ schema Prisma (`Order`, `DownloadToken`, `Lead`,
+  `NewsletterSubscriber`, `LeadMagnetToken`), klienci Supabase (admin/service-role,
+  browser, server SSR), helper podpisanych URL-i do prywatnych bucketów Storage.
 
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
-> rejestr npm). Kolejny krok: Faza 2 — Supabase (Prisma, Auth, Storage).
+> rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
+> Supabase. Kolejny krok: Faza 3 — adaptery integracji (Brevo, Przelewy24,
+> Fakturownia).
