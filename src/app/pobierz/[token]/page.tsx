@@ -65,7 +65,7 @@ export default async function DownloadStatusPage({
   return (
     <Shell>
       <p className="text-muted-foreground">
-        Twój plik „{record.order.productTitle}" jest gotowy do pobrania.
+        Twój plik „{record.order.productTitle}” jest gotowy do pobrania.
       </p>
       <p className="mt-1 text-sm text-muted-foreground">
         Link ważny do {formatDate(record.expiresAt.toISOString())}. Pozostałe
