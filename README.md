@@ -67,7 +67,12 @@ Realizacja przyrostowa według `tasks.md`:
   + kontakty), `PaymentProvider` (interfejs + `Przelewy24Provider`, fabryka wg
   `PAYMENT_PROVIDER`), `InvoiceService` (Fakturownia: auto-dokument, dane firmy,
   typ dokumentu z konfiguracji).
+- **Faza 4 — Strony treściowe** ✅ pełna strona główna (3 filary, case studies,
+  wyróżnione produkty, CTA newslettera, JSON-LD Organization/WebSite), listy
+  artykułów per filar (`/[pillar]`), strona artykułu (`/[pillar]/[slug]`) z
+  Portable Text, powiązanymi produktami/kalkulatorem, disclaimerem i JSON-LD
+  Article. Odporne ładowanie z Sanity (fallback przy braku konfiguracji).
 
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
-> Supabase. Kolejny krok: Faza 4 — strony treściowe (strona główna, blog, artykuł).
+> Supabase. Kolejny krok: Faza 5 — kalkulatory.

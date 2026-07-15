@@ -13,3 +13,16 @@ export function formatPln(grosze: number): string {
     currency: "PLN",
   }).format(grosze / 100);
 }
+
+/** Formatuje datę ISO na polski format, np. "15 lipca 2026". */
+export function formatDate(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat("pl-PL", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}

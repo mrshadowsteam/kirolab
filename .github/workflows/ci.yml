@@ -37,7 +37,8 @@ jobs:
         env:
           # Wartości placeholder — build nie może zależeć od realnych sekretów.
           NEXT_PUBLIC_SITE_URL: https://example.com
-          NEXT_PUBLIC_SANITY_PROJECT_ID: dummy
+          # Celowo BEZ NEXT_PUBLIC_SANITY_PROJECT_ID -> projectId="placeholder",
+          # isSanityConfigured=false, loadery zwracają puste dane (bez sieci).
           NEXT_PUBLIC_SANITY_DATASET: production
 
       - name: Typecheck
