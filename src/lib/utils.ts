@@ -14,6 +14,15 @@ export function formatPln(grosze: number): string {
   }).format(grosze / 100);
 }
 
+/** Parsuje kwotę w zł (np. "1 234,56" / "1234.56") na grosze; null gdy błędna. */
+export function parsePlnToGrosze(input: string): number | null {
+  const normalized = input.replace(/\s/g, "").replace(",", ".");
+  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) return null;
+  const value = Number(normalized);
+  if (!Number.isFinite(value)) return null;
+  return Math.round(value * 100);
+}
+
 /** Formatuje datę ISO na polski format, np. "15 lipca 2026". */
 export function formatDate(iso: string): string {
   try {

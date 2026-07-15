@@ -72,7 +72,14 @@ Realizacja przyrostowa według `tasks.md`:
   artykułów per filar (`/[pillar]`), strona artykułu (`/[pillar]/[slug]`) z
   Portable Text, powiązanymi produktami/kalkulatorem, disclaimerem i JSON-LD
   Article. Odporne ładowanie z Sanity (fallback przy braku konfiguracji).
+- **Faza 5 — Kalkulatory** ✅ 3 kalkulatory (odprawa z limitem 15×, ekwiwalent za
+  urlop ze współczynnikiem z CMS, porównawczy szkody całkowitej) — obliczenia po
+  stronie klienta, walidacja, disclaimer, „wyślij wynik na e-mail" (double opt-in
+  przez `/api/newsletter/subscribe`). Parametry prawne z Sanity settings (fallback
+  do stałych).
 
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
-> Supabase. Kolejny krok: Faza 5 — kalkulatory.
+> Supabase. Kolejny krok: Faza 6 — sklep i dostawa cyfrowa. Uwaga: strona
+> potwierdzenia newslettera (`/newsletter/potwierdz`) i lead magnet powstają w
+> Fazie 7.
