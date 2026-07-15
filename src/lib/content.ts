@@ -9,6 +9,7 @@ import {
   articlesByPillarQuery,
   featuredProductsQuery,
   latestArticlesQuery,
+  productBySlugQuery,
   productsQuery,
   settingsQuery,
 } from "@/sanity/lib/queries";
@@ -16,6 +17,7 @@ import type {
   ArticleCardData,
   ArticleData,
   ProductCardData,
+  ProductData,
   SettingsData,
 } from "@/lib/content-types";
 
@@ -157,6 +159,42 @@ export async function getAllProducts(): Promise<ProductCardData[]> {
   const raw = await safeFetch<RawProductCard[]>(productsQuery, {}, ["product"], []);
   return raw.map(toProductCard);
 }
+
+interface RawProduct extends RawProductCard {
+  previewContent?: unknown;
+  fileFormat?: string | null;
+  storageKey?: string | null;
+  relatedCalculator?: string | null;
+  category?: { title?: string } | null;
+  seo?: { metaTitle?: string | null; metaDescription?: string | null } | null;
+}
+
+export const getProductBySlug = cache(
+  async (slug: string): Promise<ProductData | null> => {
+    const raw = await safeFetch<RawProduct | null>(
+      productBySlugQuery,
+      { slug },
+      ["product"],
+      null,
+    );
+    if (!raw) return null;
+
+    return {
+      _id: raw._id,
+      title: raw.title,
+      slug: raw.slug,
+      priceGrosze: raw.priceGrosze,
+      shortDescription: raw.shortDescription,
+      previewContent: (raw.previewContent ?? []) as unknown as ProductData["previewContent"],
+      fileFormat: raw.fileFormat ?? null,
+      storageKey: raw.storageKey ?? null,
+      relatedCalculator: raw.relatedCalculator ?? null,
+      categoryTitle: raw.category?.title ?? null,
+      metaTitle: raw.seo?.metaTitle ?? null,
+      metaDescription: raw.seo?.metaDescription ?? null,
+    };
+  },
+);
 
 /** Pełny artykuł po slug (cache dla deduplikacji metadata + strona). */
 export const getArticleBySlug = cache(

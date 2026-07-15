@@ -78,8 +78,15 @@ Realizacja przyrostowa według `tasks.md`:
   przez `/api/newsletter/subscribe`). Parametry prawne z Sanity settings (fallback
   do stałych).
 
+- **Faza 6 — Sklep i dostawa cyfrowa** ✅ katalog (`/sklep`), strona produktu z
+  podglądem fragmentu i JSON-LD Product/Offer, checkout (e-mail + opcjonalna
+  faktura firmowa z NIP), `/api/checkout` (Order pending + Przelewy24), webhook
+  `/api/webhooks/payments` (weryfikacja podpisu + potwierdzenie transakcji →
+  Order paid + token pobrania + auto-faktura Fakturownia + e-mail Brevo), strona
+  statusu `/pobierz/[token]`, endpoint pobrania (72h / 3 pobrania, signed URL) i
+  „wyślij ponownie".
+
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
-> Supabase. Kolejny krok: Faza 6 — sklep i dostawa cyfrowa. Uwaga: strona
-> potwierdzenia newslettera (`/newsletter/potwierdz`) i lead magnet powstają w
-> Fazie 7.
+> Supabase. Kolejny krok: Faza 7 — newsletter i lead magnet (potwierdzenie DOI,
+> wydanie lead magnetu, pop-up).

@@ -46,6 +46,23 @@ export interface ArticleData {
   metaDescription: string | null;
 }
 
+/** Pełny produkt (strona sklepu). */
+export interface ProductData {
+  _id: string;
+  title: string;
+  slug: string;
+  priceGrosze: number;
+  shortDescription: string;
+  previewContent: PortableTextValue;
+  fileFormat: string | null;
+  /** Klucz pliku w Storage — używany wyłącznie po stronie serwera. */
+  storageKey: string | null;
+  relatedCalculator: string | null;
+  categoryTitle: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+}
+
 /** Ustawienia globalne (singleton). */
 export interface SettingsData {
   equivalentCoefficient: number | null;
