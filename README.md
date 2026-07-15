@@ -92,6 +92,13 @@ Realizacja przyrostowa według `tasks.md`:
   wydanie lead magnetu), pobranie darmowego wzoru `/api/pobierz-wzor/[token]`
   (30 dni, bez limitu — osobny mechanizm od tokenów sklepu).
 
+- **Faza 8 — Lead afiliacyjny i panel** ✅ formularz `/ekspert` (rodzaj sprawy,
+  opis, kontakt, zgoda RODO, odczyt UTM + kodu partnera z URL), `/api/lead`
+  (zapis + auto-przekazanie e-mailem partnerowi, fallback kodu partnera), panel
+  `/admin` chroniony Supabase Auth (`/admin/login`) z listą leadów, zmianą
+  statusu, filtrem i eksportem CSV.
+
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
-> Supabase. Kolejny krok: Faza 8 — lead afiliacyjny i panel `/admin` z eksportem CSV.
+> Supabase. Konto właściciela panelu tworzy się w Supabase Auth. Kolejny krok:
+> Faza 9 — konsultacje 1:1 (Cal.com + Stripe).
