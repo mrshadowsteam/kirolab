@@ -47,6 +47,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Test
+        run: npm run test
+
       # Zamyka pętlę zwrotną dla asystenta: komentuje wynik CI na PR
       # (status + Run ID + link do logów), co pozwala odczytać wynik przez bramkę.
       - name: Comment CI result on PR

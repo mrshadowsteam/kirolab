@@ -117,3 +117,26 @@ Realizacja przyrostowa według `tasks.md`:
 
 Implementacja MVP zgodna ze specyfikacją (`.kiro/specs/smart-obywatel`) jest
 kompletna. Aby uruchomić produkcyjnie, wykonaj kroki z `DEPLOYMENT.md`.
+
+## Testy
+
+Testy jednostkowe logiki wysokiego ryzyka (Vitest): `npm run test`.
+- **Kalkulatory** — przypadki brzegowe (progi stażu, limit 15×, mediana/średnia,
+  filtrowanie ofert, niepoprawny współczynnik).
+- **Płatności P24** — weryfikacja podpisu webhooka oraz przepływ (nieprawidłowy
+  podpis → 401, idempotencja przy zdublowanym webhooku, przerwane/nieudane
+  potwierdzenie → brak realizacji, poprawna płatność → realizacja).
+
+CI (GitHub Actions) uruchamia: build → typecheck → lint → test.
+
+## Bezpieczeństwo (stan PR)
+
+- **Webhook P24** weryfikuje podpis powiadomienia **oraz** potwierdza transakcję
+  server-to-server; realizacja jest idempotentna (ponowny webhook nie dubluje).
+- **Panel `/admin`** — uwierzytelnianie Supabase + **allow-lista `ADMIN_EMAILS`**
+  (fail-closed: bez konfiguracji panel jest zablokowany). Zalecane wyłączenie
+  publicznej rejestracji w Supabase.
+- **Sekrety** — `.env*`/`.env.local` w `.gitignore`; w repo tylko `.env.example`
+  z placeholderami (żaden realny sekret nie jest wersjonowany).
+- Tokeny pobrań i lead magnetu przechowywane jako **hash**; pliki w prywatnych
+  bucketach, udostępniane wyłącznie przez krótkotrwały signed URL.
