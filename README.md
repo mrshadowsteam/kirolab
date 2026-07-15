@@ -86,7 +86,12 @@ Realizacja przyrostowa według `tasks.md`:
   statusu `/pobierz/[token]`, endpoint pobrania (72h / 3 pobrania, signed URL) i
   „wyślij ponownie".
 
+- **Faza 7 — Newsletter i lead magnet** ✅ funkcjonalny zapis (double opt-in) z
+  CTA i pop-upu (cooldown w localStorage, ukryty na /studio, /admin itd.), strona
+  potwierdzenia `/newsletter/potwierdz` (status → confirmed, sync do Brevo,
+  wydanie lead magnetu), pobranie darmowego wzoru `/api/pobierz-wzor/[token]`
+  (30 dni, bez limitu — osobny mechanizm od tokenów sklepu).
+
 > Weryfikacja buildu odbywa się w GitHub Actions (środowisko Kiro ma zablokowany
 > rejestr npm). Migracje bazy: `npm run db:migrate` przeciw realnej instancji
-> Supabase. Kolejny krok: Faza 7 — newsletter i lead magnet (potwierdzenie DOI,
-> wydanie lead magnetu, pop-up).
+> Supabase. Kolejny krok: Faza 8 — lead afiliacyjny i panel `/admin` z eksportem CSV.

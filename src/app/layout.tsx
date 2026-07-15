@@ -4,7 +4,9 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { PlausibleAnalytics } from "@/components/analytics/plausible";
+import { NewsletterPopup } from "@/components/marketing/newsletter-popup";
 import { siteConfig } from "@/lib/site-config";
+import { getSettings } from "@/lib/content";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -42,9 +44,12 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const settings = await getSettings();
+  const cooldownDays = settings?.newsletterPopupCooldownDays ?? 14;
+
   return (
     <html lang="pl" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="flex min-h-screen flex-col font-sans">
@@ -59,6 +64,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <NewsletterPopup cooldownDays={cooldownDays} />
         <PlausibleAnalytics />
       </body>
     </html>

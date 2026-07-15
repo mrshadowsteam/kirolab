@@ -1,10 +1,8 @@
 import { Mail } from "lucide-react";
+import { NewsletterSignup } from "./newsletter-signup";
 
-/**
- * Blok CTA newslettera (prezentacyjny). Funkcjonalny zapis z double opt-in
- * i lead magnetem podłączamy w Fazie 7.
- */
-export function NewsletterCta() {
+/** Blok CTA newslettera z funkcjonalnym zapisem (double opt-in) i lead magnetem. */
+export function NewsletterCta({ source = "newsletter-cta" }: { source?: string }) {
   return (
     <section
       aria-labelledby="newsletter-heading"
@@ -25,6 +23,9 @@ export function NewsletterCta() {
             Zapisz się do newslettera Smart Obywatel i dostań pierwszy gotowy
             wzór dokumentu za darmo. Konkretne porady, zero spamu.
           </p>
+          <div className="max-w-md">
+            <NewsletterSignup source={source} />
+          </div>
         </div>
       </div>
     </section>
