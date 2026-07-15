@@ -1,6 +1,8 @@
 import "server-only";
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
+type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
 /**
  * Klient Supabase po stronie serwera (uwierzytelnianie oparte na cookie).
@@ -18,7 +20,7 @@ export function createSupabaseServerClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options),
