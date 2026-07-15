@@ -5,7 +5,8 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  // Publikacja treści przez ISR/tagi — brak CDN dla świeżych danych na żądanie.
-  useCdn: true,
+  // Dev: bez CDN (natychmiastowy podgląd świeżej treści).
+  // Produkcja: CDN (szybkość); świeżość zapewnia ISR + rewalidacja tagów po webhooku.
+  useCdn: process.env.NODE_ENV === "production",
   perspective: "published",
 });
