@@ -15,17 +15,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Install dependencies
-        run: npm ci || npm install
+        # Brak commitowanego package-lock.json (nie da się go wygenerować w
+        # środowisku bez dostępu do rejestru npm) -> używamy npm install.
+        run: npm install --no-audit --no-fund
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
+      # Build jako pierwszy: generuje next-env.d.ts oraz sam sprawdza typy i ESLint.
       - name: Build
         run: npm run build
         env:
@@ -33,3 +29,9 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://example.com
           NEXT_PUBLIC_SANITY_PROJECT_ID: dummy
           NEXT_PUBLIC_SANITY_DATASET: production
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
