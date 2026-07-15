@@ -1,0 +1,128 @@
+// Schemat bazy danych Smart Obywatel (Supabase / PostgreSQL, region EU).
+// Dane transakcyjne i PII. Treść (artykuły, produkty) jest w Sanity.
+// Migracje uruchamiane lokalnie/CI przeciw realnej bazie: `npm run db:migrate`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OrderStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum LeadStatus {
+  new
+  forwarded
+  in_contact
+  closed
+}
+
+enum SubscriberStatus {
+  pending
+  confirmed
+  unsubscribed
+}
+
+/// Zamówienie produktu cyfrowego (wzoru).
+model Order {
+  id                  String      @id @default(uuid()) @db.Uuid
+  productSanityId     String      @map("product_sanity_id")
+  productTitle        String      @map("product_title")
+  // Snapshot klucza pliku w Storage — pobieranie nie zależy od Sanity.
+  productStorageKey   String?     @map("product_storage_key")
+  amountGrosze        Int         @map("amount_grosze")
+  currency            String      @default("PLN")
+  buyerEmail          String      @map("buyer_email")
+  buyerName           String?     @map("buyer_name")
+  wantsCompanyInvoice Boolean     @default(false) @map("wants_company_invoice")
+  companyNip          String?     @map("company_nip")
+  companyName         String?     @map("company_name")
+  paymentProvider     String      @map("payment_provider")
+  paymentRef          String?     @map("payment_ref")
+  status              OrderStatus @default(pending)
+  invoiceId           String?     @map("invoice_id")
+  // ZAWSZE null w MVP; miejsce pod przyszłe konta użytkowników (Wymaganie 13).
+  userId              String?     @map("user_id") @db.Uuid
+  createdAt           DateTime    @default(now()) @map("created_at")
+  paidAt              DateTime?   @map("paid_at")
+
+  downloadTokens DownloadToken[]
+
+  @@index([buyerEmail])
+  @@index([status])
+  @@map("orders")
+}
+
+/// Token pobrania pliku sklepowego (72 h, max 3 pobrania).
+model DownloadToken {
+  id            String   @id @default(uuid()) @db.Uuid
+  orderId       String   @map("order_id") @db.Uuid
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tokenHash     String   @unique @map("token_hash")
+  expiresAt     DateTime @map("expires_at")
+  maxDownloads  Int      @default(3) @map("max_downloads")
+  downloadCount Int      @default(0) @map("download_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("download_tokens")
+}
+
+/// Lead afiliacyjny przekazywany partnerowi (kancelaria/firma odszkodowawcza).
+model Lead {
+  id          String     @id @default(uuid()) @db.Uuid
+  caseType    String     @map("case_type")
+  description String
+  name        String
+  email       String
+  phone       String?
+  utmSource   String?    @map("utm_source")
+  utmMedium   String?    @map("utm_medium")
+  utmCampaign String?    @map("utm_campaign")
+  utmContent  String?    @map("utm_content")
+  utmTerm     String?    @map("utm_term")
+  partnerCode String     @map("partner_code")
+  status      LeadStatus @default(new)
+  consentAt   DateTime   @map("consent_at")
+  forwardedAt DateTime?  @map("forwarded_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([partnerCode])
+  @@map("leads")
+}
+
+/// Subskrybent newslettera (kontrola double opt-in i wydania lead magnetu).
+model NewsletterSubscriber {
+  id               String           @id @default(uuid()) @db.Uuid
+  email            String           @unique
+  status           SubscriberStatus @default(pending)
+  confirmTokenHash String?          @map("confirm_token_hash")
+  source           String?
+  consentAt        DateTime?        @map("consent_at")
+  confirmedAt      DateTime?        @map("confirmed_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  @@map("newsletter_subscribers")
+}
+
+/// Token pobrania darmowego lead magnetu (30 dni, bez limitu pobrań).
+/// Świadomie oddzielony od logiki tokenów sklepowych (Wymaganie 7.3/7.4).
+model LeadMagnetToken {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String
+  tokenHash  String   @unique @map("token_hash")
+  storageKey String   @map("storage_key")
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("lead_magnet_tokens")
+}

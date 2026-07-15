@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Wartości placeholder dla `prisma generate` (postinstall) i buildu.
+      # Nie następuje realne połączenie z bazą podczas CI.
+      DATABASE_URL: postgresql://user:pass@localhost:5432/db
+      DIRECT_URL: postgresql://user:pass@localhost:5432/db
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        # Brak commitowanego package-lock.json (nie da się go wygenerować w
+        # środowisku bez dostępu do rejestru npm) -> używamy npm install.
+        run: npm install --no-audit --no-fund
+
+      # Build jako pierwszy: generuje next-env.d.ts oraz sam sprawdza typy i ESLint.
+      - name: Build
+        run: npm run build
+        env:
+          # Wartości placeholder — build nie może zależeć od realnych sekretów.
+          NEXT_PUBLIC_SITE_URL: https://example.com
+          # Celowo BEZ NEXT_PUBLIC_SANITY_PROJECT_ID -> projectId="placeholder",
+          # isSanityConfigured=false, loadery zwracają puste dane (bez sieci).
+          NEXT_PUBLIC_SANITY_DATASET: production
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # Zamyka pętlę zwrotną dla asystenta: komentuje wynik CI na PR
+      # (status + Run ID + link do logów), co pozwala odczytać wynik przez bramkę.
+      - name: Comment CI result on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const short = context.sha.substring(0, 7);
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const emoji = status === 'success' ? '✅' : '❌';
+            const body = [
+              `${emoji} **CI ${status}** — commit \`${short}\``,
+              '',
+              `Run ID: \`${context.runId}\``,
+              `Log: ${runUrl}`,
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
