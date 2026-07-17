@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { ArticleCard } from "@/components/content/article-card";
@@ -6,6 +7,12 @@ import { NewsletterCta } from "@/components/marketing/newsletter-cta";
 import { JsonLd } from "@/components/seo/json-ld";
 import { pillars, siteConfig } from "@/lib/site-config";
 import { getFeaturedProducts, getLatestArticles } from "@/lib/content";
+
+// Strona główna używa domyślnego title/description z root layoutu; ustawiamy
+// jedynie kanoniczny URL, aby każda indeksowalna strona miała self-canonical.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 // ISR — odśwież treść co godzinę / po webhooku rewalidacji z Sanity.
 export const revalidate = 3600;

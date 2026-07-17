@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleCard } from "@/components/content/article-card";
+import { CategoryFilter } from "@/components/content/category-filter";
 import { NewsletterCta } from "@/components/marketing/newsletter-cta";
 import { pillars } from "@/lib/site-config";
 import { getArticlesByPillar } from "@/lib/content";
@@ -56,6 +57,9 @@ export default async function PillarPage({
       </section>
 
       <section className="container py-12">
+        <h2 className="sr-only">Artykuły w kategorii {pillar.title}</h2>
+        <CategoryFilter />
+
         {articles.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (

@@ -29,6 +29,10 @@ export default async function AdminPage() {
     partnerCode: l.partnerCode,
     status: l.status as LeadStatusValue,
     utmSource: l.utmSource,
+    utmMedium: l.utmMedium,
+    utmCampaign: l.utmCampaign,
+    utmContent: l.utmContent,
+    utmTerm: l.utmTerm,
     createdAt: l.createdAt.toISOString(),
   }));
 

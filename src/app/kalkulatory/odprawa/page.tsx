@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CalculatorShell } from "@/components/calculators/calculator-shell";
-import { OdprawaCalculator } from "@/components/calculators/odprawa-calculator";
+import { OdprawaCalculator } from "@/components/calculators/dynamic";
 import { DEFAULT_MINIMUM_WAGE_GROSZE } from "@/lib/calculators/odprawa";
 import { getSettings } from "@/lib/content";
 

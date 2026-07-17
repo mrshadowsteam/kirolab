@@ -1,13 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { mainNav, siteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 
+/** Aktywna, gdy dokładne trafienie lub trasa zagnieżdżona (np. /kalkulatory/odprawa). */
+function isActive(pathname: string | null, href: string): boolean {
+  if (!pathname) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Zamknij menu po zmianie trasy (nawigacja w obrębie SPA).
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Zamknij menu klawiszem Escape (dostępność klawiaturowa).
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
@@ -15,7 +38,7 @@ export function SiteHeader() {
         <Link
           href="/"
           className="font-display text-lg font-bold text-primary"
-          onClick={() => setOpen(false)}
+          aria-current={pathname === "/" ? "page" : undefined}
         >
           {siteConfig.name}
         </Link>
@@ -25,15 +48,22 @@ export function SiteHeader() {
           aria-label="Główna nawigacja"
           className="hidden items-center gap-6 md:flex"
         >
-          {mainNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-            >
-              {item.title}
-            </Link>
-          ))}
+          {mainNav.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  active ? "text-primary" : "text-foreground/80",
+                )}
+              >
+                {item.title}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Przełącznik mobile */}
@@ -63,17 +93,24 @@ export function SiteHeader() {
         )}
       >
         <ul className="container flex flex-col py-2">
-          {mainNav.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className="block py-3 text-base font-medium text-foreground/90 hover:text-primary"
-                onClick={() => setOpen(false)}
-              >
-                {item.title}
-              </Link>
-            </li>
-          ))}
+          {mainNav.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "block py-3 text-base font-medium hover:text-primary",
+                    active ? "text-primary" : "text-foreground/90",
+                  )}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.title}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </header>

@@ -53,6 +53,7 @@ export const mainNav = [
   { title: "Kalkulatory", href: "/kalkulatory" },
   { title: "Sklep", href: "/sklep" },
   { title: "Konsultacje", href: "/konsultacje" },
+  { title: "Ekspert", href: "/ekspert" },
 ];
 
 export const legalNav = [

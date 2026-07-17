@@ -58,18 +58,25 @@ export async function POST(req: NextRequest) {
       "direct";
   }
 
+  const phone = optStr(body.phone);
+  const utmSource = optStr(body.utmSource);
+  const utmMedium = optStr(body.utmMedium);
+  const utmCampaign = optStr(body.utmCampaign);
+  const utmContent = optStr(body.utmContent);
+  const utmTerm = optStr(body.utmTerm);
+
   const lead = await prisma.lead.create({
     data: {
       caseType,
       description,
       name,
       email,
-      phone: optStr(body.phone),
-      utmSource: optStr(body.utmSource),
-      utmMedium: optStr(body.utmMedium),
-      utmCampaign: optStr(body.utmCampaign),
-      utmContent: optStr(body.utmContent),
-      utmTerm: optStr(body.utmTerm),
+      phone,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmContent,
+      utmTerm,
       partnerCode,
       consentAt: new Date(),
       status: "new",
@@ -88,8 +95,14 @@ export async function POST(req: NextRequest) {
           `<p><strong>Opis:</strong> ${esc(description)}</p>` +
           `<p><strong>Imię:</strong> ${esc(name)}</p>` +
           `<p><strong>E-mail:</strong> ${esc(email)}</p>` +
-          `<p><strong>Telefon:</strong> ${esc(optStr(body.phone) ?? "—")}</p>` +
-          `<p><strong>Kod partnera:</strong> ${esc(partnerCode)}</p>`,
+          `<p><strong>Telefon:</strong> ${esc(phone ?? "—")}</p>` +
+          `<p><strong>Kod partnera:</strong> ${esc(partnerCode)}</p>` +
+          `<h3>UTM</h3>` +
+          `<p><strong>source:</strong> ${esc(utmSource ?? "—")}</p>` +
+          `<p><strong>medium:</strong> ${esc(utmMedium ?? "—")}</p>` +
+          `<p><strong>campaign:</strong> ${esc(utmCampaign ?? "—")}</p>` +
+          `<p><strong>content:</strong> ${esc(utmContent ?? "—")}</p>` +
+          `<p><strong>term:</strong> ${esc(utmTerm ?? "—")}</p>`,
       });
       await prisma.lead.update({
         where: { id: lead.id },

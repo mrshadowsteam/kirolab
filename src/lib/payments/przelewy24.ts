@@ -1,5 +1,5 @@
 import "server-only";
-import { createHash } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import type {
   ConfirmTransactionParams,
   CreatePaymentParams,
@@ -10,8 +10,17 @@ import type {
 
 /**
  * Implementacja Przelewy24 (REST API v1). Obsługuje BLIK, kartę i szybki przelew.
- * UWAGA: parametry poprawności podpisu należy potwierdzić w środowisku sandbox
- * P24 przed produkcją.
+ *
+ * Kolejność pól w podpisach SHA-384 jest zgodna z oficjalną specyfikacją
+ * P24 REST API v1 (potwierdzone z dokumentacją operatora):
+ *   - transaction/register: { sessionId, merchantId, amount, currency, crc }
+ *   - notification (webhook): { merchantId, posId, sessionId, amount, originAmount,
+ *       currency, orderId, methodId, statement, crc }
+ *   - transaction/verify:   { sessionId, orderId, amount, currency, crc }
+ * Podpis = sha384(JSON.stringify(obiekt_o_powyższej_kolejności)).
+ *
+ * UWAGA: przed produkcją wykonaj płatność testową w środowisku sandbox P24,
+ * aby potwierdzić poprawność kluczy (P24_CRC/P24_API_KEY) i przepływu webhooka.
  */
 
 function env(name: string): string {
@@ -93,6 +102,8 @@ export class Przelewy24Provider implements PaymentProvider {
   }
 
   verifyWebhookSignature(payload: PaymentWebhookPayload): boolean {
+    if (typeof payload.sign !== "string") return false;
+
     const crc = env("P24_CRC");
     const expected = sign({
       merchantId: payload.merchantId,
@@ -106,7 +117,12 @@ export class Przelewy24Provider implements PaymentProvider {
       statement: payload.statement,
       crc,
     });
-    return typeof payload.sign === "string" && payload.sign === expected;
+
+    // Porównanie w czasie stałym, aby nie ujawniać podpisu przez timing.
+    const received = Buffer.from(payload.sign, "utf8");
+    const computed = Buffer.from(expected, "utf8");
+    if (received.length !== computed.length) return false;
+    return timingSafeEqual(received, computed);
   }
 
   async confirmTransaction(

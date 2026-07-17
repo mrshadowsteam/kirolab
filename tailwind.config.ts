@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 /**
  * System wizualny Smart Obywatel.
@@ -43,17 +44,23 @@ const config: Config = {
         },
         // Bursztyn dla tekstu/linków na jasnym tle (WCAG AA)
         "amber-strong": "#B45309",
-        success: "#16A34A",
+        // Zieleń sukcesu — green-700. Ciemniejsza od green-600 (#16A34A), aby
+        // przechodzić WCAG AA zarówno jako tekst na jasnym tle (~4.8:1), jak i
+        // jako biały tekst na wypełnieniu (~5.0:1). #16A34A dawał tylko ~3.2:1.
+        success: "#15803D",
         warning: "#B45309",
         destructive: {
           DEFAULT: "#DC2626",
           foreground: "#FFFFFF",
         },
-        // Kolory filarów
+        // Kolory filarów (biały tekst na wypełnieniu -> wymóg kontrastu AA).
+        // Kariera (indygo) ~6.3:1 i Prawo Pracy (teal) ~5.5:1 przechodzą.
+        // Prawa Konsumenta -> orange-700 (#C2410C, ~5.2:1) zamiast amber-600
+        // (#D97706), który z białym tekstem dawał tylko ~3.2:1 (poniżej AA).
         pillar: {
           kariera: "#4F46E5",
           "prawo-pracy": "#0F766E",
-          "prawa-konsumenta": "#D97706",
+          "prawa-konsumenta": "#C2410C",
         },
       },
       fontFamily: {
@@ -70,7 +77,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [tailwindcssAnimate],
 };
 
 export default config;

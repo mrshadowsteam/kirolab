@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -48,10 +48,16 @@ export function LeadForm() {
     "idle",
   );
   const [error, setError] = useState("");
+  const successRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTracking(readTracking());
   }, []);
+
+  // Po wysłaniu przenosimy focus na potwierdzenie, aby czytnik ekranu je odczytał.
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -90,7 +96,12 @@ export function LeadForm() {
 
   if (status === "success") {
     return (
-      <div className="rounded-lg border border-success/40 bg-success/10 p-6">
+      <div
+        ref={successRef}
+        role="status"
+        tabIndex={-1}
+        className="rounded-lg border border-success/40 bg-success/10 p-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      >
         <p className="font-medium">Dziękujemy! Zgłoszenie zostało wysłane.</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Przekazaliśmy Twoją sprawę partnerowi. Skontaktuje się z Tobą, aby

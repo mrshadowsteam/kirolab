@@ -65,6 +65,12 @@ export async function sendTransactionalEmail(
   }
 }
 
+/**
+ * Alias zgodny z nazwą metody adaptera `EmailService.sendTransactional()`
+ * z dokumentu projektowego (design.md §6). Wskazuje na `sendTransactionalEmail`.
+ */
+export const sendTransactional = sendTransactionalEmail;
+
 export interface UpsertContactParams {
   email: string;
   attributes?: Record<string, unknown>;
@@ -89,5 +95,36 @@ export async function upsertContact(input: UpsertContactParams): Promise<void> {
   if (!res.ok && res.status !== 204) {
     const text = await res.text();
     throw new Error(`Brevo upsertContact ${res.status}: ${text}`);
+  }
+}
+
+export interface AddToListParams {
+  /** Identyfikator listy Brevo (np. BREVO_NEWSLETTER_LIST_ID). */
+  listId: number;
+  /** Adresy e-mail istniejących kontaktów do dodania na listę. */
+  emails: string[];
+}
+
+/**
+ * Dodaje istniejące kontakty do listy Brevo (np. po potwierdzeniu newslettera).
+ * Endpoint: POST /contacts/lists/{listId}/contacts/add.
+ */
+export async function addToList(input: AddToListParams): Promise<void> {
+  // Brak adresów = brak operacji (unikamy zbędnego zapytania i błędu 400).
+  if (input.emails.length === 0) return;
+
+  const res = await fetch(
+    `${BREVO_API}/contacts/lists/${input.listId}/contacts/add`,
+    {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({ emails: input.emails }),
+    },
+  );
+
+  // 201 = dodano, 204 = brak zmian (kontakty już na liście) — oba traktujemy jak sukces.
+  if (!res.ok && res.status !== 204) {
+    const text = await res.text();
+    throw new Error(`Brevo addToList ${res.status}: ${text}`);
   }
 }

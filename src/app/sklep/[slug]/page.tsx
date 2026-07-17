@@ -4,11 +4,19 @@ import { notFound } from "next/navigation";
 import { RichText } from "@/components/content/portable-text";
 import { JsonLd } from "@/components/seo/json-ld";
 import { buttonVariants } from "@/components/ui/button";
-import { legalDisclaimer } from "@/lib/site-config";
+import { legalDisclaimer, siteConfig } from "@/lib/site-config";
 import { formatPln } from "@/lib/utils";
-import { getProductBySlug } from "@/lib/content";
+import { getAllProductParams, getProductBySlug } from "@/lib/content";
 
 export const revalidate = 3600;
+
+/**
+ * Prerenderuj znane produkty (SSG). Nieznane/nowe slugi renderują się na żądanie
+ * (ISR). Gdy Sanity nie jest skonfigurowany → [] i build nadal przechodzi.
+ */
+export async function generateStaticParams() {
+  return getAllProductParams();
+}
 
 export async function generateMetadata({
   params,
@@ -39,6 +47,7 @@ export default async function ProductPage({
     description: product.shortDescription,
     offers: {
       "@type": "Offer",
+      url: `${siteConfig.url}/sklep/${product.slug}`,
       price: (product.priceGrosze / 100).toFixed(2),
       priceCurrency: "PLN",
       availability: "https://schema.org/InStock",

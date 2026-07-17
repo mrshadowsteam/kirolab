@@ -50,6 +50,11 @@ model Order {
   paymentRef          String?     @map("payment_ref")
   status              OrderStatus @default(pending)
   invoiceId           String?     @map("invoice_id")
+  // Zgoda RODO: akceptacja regulaminu sklepu + zrzeczenie prawa odstąpienia
+  // (dostarczenie treści cyfrowej). Zapisujemy moment jej wyrażenia; źródłem/
+  // kontekstem zgody jest samo zamówienie (checkout danego produktu).
+  // Nullable — dodane przyrostowo; starsze zamówienia mogą mieć NULL.
+  consentAt           DateTime?   @map("consent_at")
   // ZAWSZE null w MVP; miejsce pod przyszłe konta użytkowników (Wymaganie 13).
   userId              String?     @map("user_id") @db.Uuid
   createdAt           DateTime    @default(now()) @map("created_at")

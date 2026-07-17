@@ -38,6 +38,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, alreadyProcessed: true });
   }
 
+  // Ochrona przed niezgodnością kwoty: podpis potwierdził już autentyczność
+  // payloadu, więc `amount`/`currency` z powiadomienia są wiarygodne. Odrzucamy
+  // rozbieżność względem zamówienia, zanim potwierdzimy transakcję — obrona w
+  // głąb przed realizacją zaniżonej płatności (niezależnie od weryfikacji P24).
+  const notifiedAmount = Number(payload.amount);
+  const notifiedCurrency =
+    typeof payload.currency === "string" ? payload.currency : null;
+  if (
+    !Number.isFinite(notifiedAmount) ||
+    notifiedAmount !== order.amountGrosze ||
+    (notifiedCurrency !== null && notifiedCurrency !== order.currency)
+  ) {
+    return new NextResponse("Niezgodność kwoty transakcji", { status: 400 });
+  }
+
   const confirmed = await provider.confirmTransaction({
     sessionId,
     orderId: p24OrderId,

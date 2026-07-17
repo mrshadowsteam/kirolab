@@ -55,7 +55,11 @@ export function NewsletterPopup({ cooldownDays }: { cooldownDays: number }) {
   if (!visible || excluded) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-lg border border-border bg-background p-5 shadow-lg">
+    <div
+      role="region"
+      aria-labelledby="nl-popup-heading"
+      className="fixed bottom-4 right-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-lg border border-border bg-background p-5 shadow-lg"
+    >
       <button
         type="button"
         onClick={close}
@@ -64,7 +68,9 @@ export function NewsletterPopup({ cooldownDays }: { cooldownDays: number }) {
       >
         <X className="h-4 w-4" aria-hidden />
       </button>
-      <h2 className="pr-6 text-lg font-semibold">Darmowy wzór pisma</h2>
+      <h2 id="nl-popup-heading" className="pr-6 text-lg font-semibold">
+        Darmowy wzór pisma
+      </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Zapisz się do newslettera i odbierz pierwszy wzór dokumentu za darmo.
       </p>

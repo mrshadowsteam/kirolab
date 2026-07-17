@@ -19,6 +19,10 @@ export interface LeadRow {
   partnerCode: string;
   status: LeadStatusValue;
   utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  utmContent: string | null;
+  utmTerm: string | null;
   createdAt: string;
 }
 
@@ -75,14 +79,29 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
 
       <div className="mt-6 overflow-x-auto">
         <table className="w-full min-w-[900px] border-collapse text-sm">
+          <caption className="sr-only">
+            Lista leadów z danymi kontaktowymi, źródłem i statusem obsługi
+          </caption>
           <thead>
             <tr className="border-b border-border text-left">
-              <th className="p-2">Data</th>
-              <th className="p-2">Sprawa</th>
-              <th className="p-2">Kontakt</th>
-              <th className="p-2">Opis</th>
-              <th className="p-2">Partner / źródło</th>
-              <th className="p-2">Status</th>
+              <th scope="col" className="p-2">
+                Data
+              </th>
+              <th scope="col" className="p-2">
+                Sprawa
+              </th>
+              <th scope="col" className="p-2">
+                Kontakt
+              </th>
+              <th scope="col" className="p-2">
+                Opis
+              </th>
+              <th scope="col" className="p-2">
+                Partner / źródło
+              </th>
+              <th scope="col" className="p-2">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -104,9 +123,19 @@ export function LeadsTable({ leads }: { leads: LeadRow[] }) {
                 </td>
                 <td className="p-2 whitespace-nowrap">
                   <div>{lead.partnerCode}</div>
-                  {lead.utmSource ? (
-                    <div className="text-muted-foreground">{lead.utmSource}</div>
-                  ) : null}
+                  {[
+                    ["source", lead.utmSource],
+                    ["medium", lead.utmMedium],
+                    ["campaign", lead.utmCampaign],
+                    ["content", lead.utmContent],
+                    ["term", lead.utmTerm],
+                  ]
+                    .filter(([, value]) => value)
+                    .map(([label, value]) => (
+                      <div key={label} className="text-xs text-muted-foreground">
+                        {label}: {value}
+                      </div>
+                    ))}
                 </td>
                 <td className="p-2">
                   <select

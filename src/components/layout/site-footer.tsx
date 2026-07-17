@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewsletterSignup } from "@/components/marketing/newsletter-signup";
 import {
   legalDisclaimer,
   legalNav,
@@ -53,6 +54,30 @@ export function SiteFooter() {
           </ul>
         </nav>
       </div>
+
+      {/* Zapis do newslettera — dostępny ze stopki na każdej stronie (wym. 7.1) */}
+      <section
+        aria-labelledby="footer-newsletter-heading"
+        className="border-t border-border"
+      >
+        <div className="container flex flex-col gap-6 py-10 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-md">
+            <h2
+              id="footer-newsletter-heading"
+              className="font-display text-lg font-bold text-primary"
+            >
+              Newsletter Smart Obywatel
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Zapisz się i odbierz darmowy wzór pisma. Konkretne porady, zero
+              spamu — zgodę możesz wycofać w każdej chwili.
+            </p>
+          </div>
+          <div className="w-full max-w-sm">
+            <NewsletterSignup source="footer" />
+          </div>
+        </div>
+      </section>
 
       {/* Disclaimer widoczny na każdej stronie */}
       <div className="border-t border-border">
