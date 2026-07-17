@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { RichText } from "@/components/content/portable-text";
-import { buttonVariants } from "@/components/ui/button";
+import { CalcomEmbed } from "@/components/consultations/dynamic";
 import { getSettings } from "@/lib/content";
 import { formatPln } from "@/lib/utils";
 import { legalDisclaimer } from "@/lib/site-config";
@@ -20,7 +20,7 @@ export default async function ConsultationsPage() {
     settings?.calcomLink ?? process.env.NEXT_PUBLIC_CALCOM_LINK ?? "";
 
   return (
-    <div className="container max-w-2xl py-12">
+    <div className="container max-w-4xl py-12">
       <h1 className="text-3xl md:text-4xl">Konsultacje 1:1</h1>
 
       <div className="mt-4">
@@ -47,26 +47,25 @@ export default async function ConsultationsPage() {
         </p>
       ) : null}
 
-      <div className="mt-8">
-        {calcomLink ? (
-          <a
-            href={calcomLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonVariants({ variant: "primary", size: "lg" })}
-          >
-            Zarezerwuj termin
-          </a>
-        ) : (
-          <p className="rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-            Rezerwacja terminów będzie dostępna wkrótce.
-          </p>
-        )}
-      </div>
+      <section className="mt-8" aria-labelledby="rezerwacja">
+        <h2 id="rezerwacja" className="text-2xl">
+          Zarezerwuj termin
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Rezerwacja i płatność (z góry, przez Stripe) odbywają się w bezpiecznym
+          systemie Cal.com — termin potwierdzamy dopiero po opłaceniu.
+        </p>
 
-      <p className="mt-3 text-sm text-muted-foreground">
-        Rezerwacja i płatność (z góry) odbywają się w bezpiecznym systemie Cal.com.
-      </p>
+        <div className="mt-4">
+          {calcomLink ? (
+            <CalcomEmbed calcomLink={calcomLink} />
+          ) : (
+            <p className="rounded-md border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+              Rezerwacja terminów będzie dostępna wkrótce.
+            </p>
+          )}
+        </div>
+      </section>
 
       <p className="mt-8 rounded-md border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
         {legalDisclaimer}

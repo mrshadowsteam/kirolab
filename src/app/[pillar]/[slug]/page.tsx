@@ -9,9 +9,17 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { buttonVariants } from "@/components/ui/button";
 import { legalDisclaimer, siteConfig } from "@/lib/site-config";
 import { formatDate } from "@/lib/utils";
-import { getArticleBySlug } from "@/lib/content";
+import { getAllArticleParams, getArticleBySlug } from "@/lib/content";
 
 export const revalidate = 3600;
+
+/**
+ * Prerenderuj znane artykuły (SSG). Nieznane/nowe slugi renderują się na żądanie
+ * (ISR). Gdy Sanity nie jest skonfigurowany → [] i build nadal przechodzi.
+ */
+export async function generateStaticParams() {
+  return getAllArticleParams();
+}
 
 const CALCULATOR_LABELS: Record<string, string> = {
   odprawa: "Kalkulator odprawy",

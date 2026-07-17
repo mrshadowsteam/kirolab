@@ -13,7 +13,17 @@ import {
 } from "@/lib/calculators/szkoda";
 import { formatPln, parsePlnToGrosze } from "@/lib/utils";
 
-export function SzkodaCalculator() {
+/** Powiązany wzór pisma w sklepie (pochodzi z pola `relatedCalculator` w CMS). */
+export interface RelatedProduct {
+  slug: string;
+  title: string;
+}
+
+export function SzkodaCalculator({
+  relatedProduct = null,
+}: {
+  relatedProduct?: RelatedProduct | null;
+}) {
   const [insurer, setInsurer] = useState("");
   const [offers, setOffers] = useState<string[]>(["", "", ""]);
   const [result, setResult] = useState<SzkodaResult | null>(null);
@@ -170,14 +180,18 @@ export function SzkodaCalculator() {
           {result.diffFromMedianGrosze > 0 ? (
             <div className="rounded-lg border border-border bg-primary/5 p-5">
               <p className="text-sm">
-                Twoja wycena może być zaniżona. Rozważ odwołanie — gotowy wzór
-                pisma znajdziesz w sklepie.
+                Twoja wycena może być zaniżona. Rozważ odwołanie —{" "}
+                {relatedProduct
+                  ? "skorzystaj z gotowego wzoru pisma:"
+                  : "gotowe wzory pism znajdziesz w sklepie."}
               </p>
               <Link
-                href="/sklep"
+                href={
+                  relatedProduct ? `/sklep/${relatedProduct.slug}` : "/sklep"
+                }
                 className={`mt-3 ${buttonVariants({ variant: "teal", size: "sm" })}`}
               >
-                Zobacz wzory odwołań
+                {relatedProduct ? relatedProduct.title : "Zobacz wzory odwołań"}
               </Link>
             </div>
           ) : null}

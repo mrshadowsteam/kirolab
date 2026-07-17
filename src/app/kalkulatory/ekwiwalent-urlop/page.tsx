@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CalculatorShell } from "@/components/calculators/calculator-shell";
-import { EkwiwalentCalculator } from "@/components/calculators/ekwiwalent-calculator";
+import { EkwiwalentCalculator } from "@/components/calculators/dynamic";
 import { DEFAULT_EQUIVALENT_COEFFICIENT } from "@/lib/calculators/ekwiwalent";
 import { getSettings } from "@/lib/content";
 

@@ -2,10 +2,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getProductBySlug } from "@/lib/content";
 import { getPaymentProvider } from "@/lib/payments";
+import { isValidNip, normalizeNip } from "@/lib/nip";
 import { siteConfig } from "@/lib/site-config";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-const NIP_RE = /^\d{10}$/;
 
 /**
  * Inicjuje zakup: tworzy zamówienie (pending) i rejestruje płatność u operatora.
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     wantsCompanyInvoice?: unknown;
     companyName?: unknown;
     companyNip?: unknown;
+    consent?: unknown;
   } | null;
 
   if (!body || typeof body.productSlug !== "string" || typeof body.email !== "string") {
@@ -30,15 +31,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nieprawidłowy adres e-mail." }, { status: 400 });
   }
 
+  // Akceptacja regulaminu jest walidowana również po stronie serwera —
+  // blokada po stronie klienta jest łatwa do obejścia, a zgoda na dostarczenie
+  // treści cyfrowej (zrzeczenie się prawa odstąpienia) ma znaczenie prawne.
+  if (body.consent !== true) {
+    return NextResponse.json(
+      { error: "Wymagana jest akceptacja regulaminu sklepu." },
+      { status: 400 },
+    );
+  }
+
   const wantsCompanyInvoice = body.wantsCompanyInvoice === true;
   const companyName =
     typeof body.companyName === "string" ? body.companyName.trim() : "";
-  const companyNip =
-    typeof body.companyNip === "string" ? body.companyNip.replace(/[\s-]/g, "") : "";
+  const rawNip = typeof body.companyNip === "string" ? body.companyNip : "";
+  // NIP przekazywany do Fakturowni przechowujemy w postaci znormalizowanej (same cyfry).
+  const companyNip = normalizeNip(rawNip);
 
-  if (wantsCompanyInvoice && (!companyName || !NIP_RE.test(companyNip))) {
+  if (wantsCompanyInvoice && (!companyName || !isValidNip(rawNip))) {
     return NextResponse.json(
-      { error: "Do faktury na firmę podaj nazwę firmy i poprawny NIP (10 cyfr)." },
+      { error: "Do faktury na firmę podaj nazwę firmy i poprawny NIP." },
       { status: 400 },
     );
   }
@@ -64,6 +76,9 @@ export async function POST(req: NextRequest) {
       companyNip: wantsCompanyInvoice ? companyNip : null,
       paymentProvider: process.env.PAYMENT_PROVIDER ?? "przelewy24",
       status: "pending",
+      // Zgoda RODO (akceptacja regulaminu + zrzeczenie prawa odstąpienia)
+      // zapisywana z czasem; kontekstem/źródłem zgody jest to zamówienie.
+      consentAt: new Date(),
     },
   });
 

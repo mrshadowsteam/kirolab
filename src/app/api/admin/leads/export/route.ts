@@ -27,6 +27,10 @@ export async function GET() {
     "utm_source",
     "utm_medium",
     "utm_campaign",
+    "utm_content",
+    "utm_term",
+    "Zgoda RODO",
+    "Przekazano partnerowi",
     "Opis",
   ];
 
@@ -41,6 +45,10 @@ export async function GET() {
     l.utmSource ?? "",
     l.utmMedium ?? "",
     l.utmCampaign ?? "",
+    l.utmContent ?? "",
+    l.utmTerm ?? "",
+    l.consentAt.toISOString(),
+    l.forwardedAt?.toISOString() ?? "",
     l.description,
   ]);
 

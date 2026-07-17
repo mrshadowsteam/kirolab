@@ -46,6 +46,21 @@ export const articleBySlugQuery = groq`
   }
 `;
 
+/** Slugi artykułów wraz z filarem — do prerenderu SSG (generateStaticParams). */
+export const articleParamsQuery = groq`
+  *[_type == "article" && defined(slug.current) && defined(pillar->slug.current)]{
+    "slug": slug.current,
+    "pillar": pillar->slug.current
+  }
+`;
+
+/** Slugi produktów — do prerenderu SSG (generateStaticParams). */
+export const productParamsQuery = groq`
+  *[_type == "product" && defined(slug.current)]{
+    "slug": slug.current
+  }
+`;
+
 /** Lista produktów w sklepie. */
 export const productsQuery = groq`
   *[_type == "product" && defined(slug.current)] | order(_createdAt desc){
@@ -67,6 +82,19 @@ export const productBySlugQuery = groq`
 /** Wyróżnione produkty na stronę główną. */
 export const featuredProductsQuery = groq`
   *[_type == "product" && defined(slug.current)] | order(_createdAt desc)[0...$limit]{
+    _id, title, "slug": slug.current, priceGrosze, shortDescription
+  }
+`;
+
+/**
+ * Wzór pisma powiązany z danym kalkulatorem (np. odwołanie od wyceny szkody
+ * całkowitej). Źródłem powiązania jest pole `relatedCalculator` produktu w CMS —
+ * dzięki temu link z kalkulatora nie jest zakodowany na stałe (wym. 3.13).
+ * Gdyby autor przypisał kilka produktów, bierzemy najstarszy (deterministycznie).
+ */
+export const productByCalculatorQuery = groq`
+  *[_type == "product" && relatedCalculator == $calculator && defined(slug.current)]
+    | order(_createdAt asc)[0]{
     _id, title, "slug": slug.current, priceGrosze, shortDescription
   }
 `;

@@ -1,11 +1,12 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { isValidNip } from "@/lib/nip";
 
 const inputClass =
-  "mt-1 w-full rounded-md border border-border bg-white px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+  "mt-1 w-full rounded-md border border-border bg-white px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary aria-[invalid=true]:border-destructive";
 
 export function CheckoutForm({ productSlug }: { productSlug: string }) {
   const [email, setEmail] = useState("");
@@ -16,13 +17,33 @@ export function CheckoutForm({ productSlug }: { productSlug: string }) {
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState("");
+  const [nipInvalid, setNipInvalid] = useState(false);
+
+  const consentRef = useRef<HTMLInputElement>(null);
+  const companyNameRef = useRef<HTMLInputElement>(null);
+  const companyNipRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!consent) {
-      setError("Zaakceptuj regulamin sklepu, aby kontynuować.");
+    setNipInvalid(false);
+
+    if (wantsInvoice && !companyName.trim()) {
+      setError("Podaj nazwę firmy do faktury.");
+      companyNameRef.current?.focus();
       return;
     }
+    if (wantsInvoice && !isValidNip(companyNip)) {
+      setNipInvalid(true);
+      setError("Podaj poprawny NIP (10 cyfr z prawidłową sumą kontrolną).");
+      companyNipRef.current?.focus();
+      return;
+    }
+    if (!consent) {
+      setError("Zaakceptuj regulamin sklepu, aby kontynuować.");
+      consentRef.current?.focus();
+      return;
+    }
+
     setStatus("loading");
     setError("");
     try {
@@ -36,6 +57,7 @@ export function CheckoutForm({ productSlug }: { productSlug: string }) {
           wantsCompanyInvoice: wantsInvoice,
           companyName: wantsInvoice ? companyName : undefined,
           companyNip: wantsInvoice ? companyNip : undefined,
+          consent,
         }),
       });
       const data = (await res.json()) as {
@@ -92,19 +114,28 @@ export function CheckoutForm({ productSlug }: { productSlug: string }) {
           type="checkbox"
           checked={wantsInvoice}
           onChange={(e) => setWantsInvoice(e.target.checked)}
+          aria-expanded={wantsInvoice}
+          aria-controls="company-invoice-fields"
         />
         Chcę fakturę na firmę
       </label>
 
       {wantsInvoice ? (
-        <div className="space-y-4 rounded-md border border-border bg-muted/20 p-4">
+        <fieldset
+          id="company-invoice-fields"
+          className="space-y-4 rounded-md border border-border bg-muted/20 p-4"
+        >
+          <legend className="px-1 text-sm font-medium">Dane do faktury</legend>
           <div>
             <label htmlFor="companyName" className="text-sm font-medium">
               Nazwa firmy
             </label>
             <input
               id="companyName"
+              ref={companyNameRef}
               type="text"
+              required
+              autoComplete="organization"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               className={inputClass}
@@ -116,18 +147,29 @@ export function CheckoutForm({ productSlug }: { productSlug: string }) {
             </label>
             <input
               id="companyNip"
+              ref={companyNipRef}
               inputMode="numeric"
+              required
               value={companyNip}
-              onChange={(e) => setCompanyNip(e.target.value)}
+              onChange={(e) => {
+                setCompanyNip(e.target.value);
+                if (nipInvalid) setNipInvalid(false);
+              }}
               className={inputClass}
               placeholder="10 cyfr"
+              aria-invalid={nipInvalid}
+              aria-describedby="companyNip-hint"
             />
+            <p id="companyNip-hint" className="mt-1 text-xs text-muted-foreground">
+              10 cyfr, np. 123-456-32-18. Sprawdzamy poprawność numeru.
+            </p>
           </div>
-        </div>
+        </fieldset>
       ) : null}
 
       <label className="flex items-start gap-2 text-xs text-muted-foreground">
         <input
+          ref={consentRef}
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}

@@ -4,7 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { PlausibleAnalytics } from "@/components/analytics/plausible";
-import { NewsletterPopup } from "@/components/marketing/newsletter-popup";
+import { NewsletterPopupLoader } from "@/components/marketing/newsletter-popup-loader";
 import { siteConfig } from "@/lib/site-config";
 import { getSettings } from "@/lib/content";
 
@@ -68,7 +68,7 @@ export default async function RootLayout({
           {children}
         </main>
         <SiteFooter />
-        <NewsletterPopup cooldownDays={cooldownDays} />
+        <NewsletterPopupLoader cooldownDays={cooldownDays} />
         <PlausibleAnalytics />
       </body>
     </html>

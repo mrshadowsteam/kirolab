@@ -7,11 +7,14 @@ import { isSanityConfigured } from "@/sanity/env";
 import {
   allSlugsForSitemapQuery,
   articleBySlugQuery,
+  articleParamsQuery,
   articlesByPillarQuery,
   featuredProductsQuery,
   latestArticlesQuery,
   legalPageQuery,
+  productByCalculatorQuery,
   productBySlugQuery,
+  productParamsQuery,
   productsQuery,
   settingsQuery,
 } from "@/sanity/lib/queries";
@@ -164,6 +167,40 @@ export async function getAllProducts(): Promise<ProductCardData[]> {
   return raw.map(toProductCard);
 }
 
+/**
+ * Slugi wszystkich produktów do prerenderu SSG (generateStaticParams).
+ * Gdy Sanity nie jest skonfigurowany, zwraca [] — build przechodzi, a strony
+ * produktów renderują się na żądanie (ISR, `dynamicParams` domyślnie true).
+ */
+export async function getAllProductParams(): Promise<{ slug: string }[]> {
+  const raw = await safeFetch<{ slug: string | null }[]>(
+    productParamsQuery,
+    {},
+    ["product"],
+    [],
+  );
+  return raw
+    .filter((r): r is { slug: string } => Boolean(r.slug))
+    .map((r) => ({ slug: r.slug }));
+}
+
+/**
+ * Wzór pisma powiązany z danym kalkulatorem (pole `relatedCalculator` w CMS).
+ * Zwraca `null`, gdy CMS nie jest skonfigurowany lub autor nie przypisał produktu
+ * — wtedy kalkulator linkuje do ogólnego katalogu sklepu jako fallback.
+ */
+export async function getProductForCalculator(
+  calculator: string,
+): Promise<ProductCardData | null> {
+  const raw = await safeFetch<RawProductCard | null>(
+    productByCalculatorQuery,
+    { calculator },
+    ["product"],
+    null,
+  );
+  return raw ? toProductCard(raw) : null;
+}
+
 interface RawProduct extends RawProductCard {
   previewContent?: unknown;
   fileFormat?: string | null;
@@ -231,6 +268,27 @@ export const getArticleBySlug = cache(
     };
   },
 );
+
+/**
+ * Parametry (filar + slug) wszystkich artykułów do prerenderu SSG.
+ * Gdy Sanity nie jest skonfigurowany, zwraca [] — build zbuduje się, a strony
+ * artykułów renderują się na żądanie (ISR, `dynamicParams` domyślnie true).
+ */
+export async function getAllArticleParams(): Promise<
+  { pillar: string; slug: string }[]
+> {
+  const raw = await safeFetch<{ pillar: string | null; slug: string | null }[]>(
+    articleParamsQuery,
+    {},
+    ["article"],
+    [],
+  );
+  return raw
+    .filter(
+      (r): r is { pillar: string; slug: string } => Boolean(r.pillar && r.slug),
+    )
+    .map((r) => ({ pillar: r.pillar, slug: r.slug }));
+}
 
 export async function getSettings(): Promise<SettingsData | null> {
   return safeFetch<SettingsData | null>(settingsQuery, {}, ["settings"], null);

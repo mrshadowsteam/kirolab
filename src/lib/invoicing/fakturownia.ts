@@ -28,6 +28,20 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+/**
+ * Stawka podatku dla pozycji z konfiguracji (FAKTUROWNIA_TAX).
+ * - Nie-VAT: wartości specjalne Fakturowni jako string ("disabled", "zw", "np", "oo").
+ * - VAT (po przejściu na JDG): stawka liczbowa, np. 23 — Fakturownia oczekuje liczby,
+ *   więc numeryczne wartości z env (zawsze string) zamieniamy na number.
+ * Domyślnie "disabled" (osoba prywatna / działalność nierejestrowana).
+ */
+function resolveTax(): number | string {
+  const raw = process.env.FAKTUROWNIA_TAX ?? "disabled";
+  const trimmed = raw.trim();
+  const numeric = Number(trimmed);
+  return trimmed !== "" && Number.isFinite(numeric) ? numeric : trimmed;
+}
+
 export async function createInvoiceForOrder(
   input: CreateInvoiceInput,
 ): Promise<CreateInvoiceResult> {
@@ -56,11 +70,11 @@ export async function createInvoiceForOrder(
       buyer_name: buyerName,
       buyer_email: input.buyerEmail,
       buyer_tax_no: input.companyNip ?? null,
-      // Dla nie-VAT: podatek wyłączony ("disabled").
+      // Nie-VAT: podatek wyłączony ("disabled"); VAT/JDG: stawka liczbowa (np. 23).
       positions: [
         {
           name: input.productTitle,
-          tax: process.env.FAKTUROWNIA_TAX ?? "disabled",
+          tax: resolveTax(),
           total_price_gross: totalPriceGross,
           quantity: 1,
         },

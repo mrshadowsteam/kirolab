@@ -93,5 +93,17 @@ export async function fulfillPaidOrder(order: Order): Promise<void> {
     console.error("Błąd wystawiania faktury (kontynuuję realizację):", error);
   }
 
-  await sendDownloadEmail(order, token);
+  // E-mail dostarczamy najlepszym wysiłkiem: płatność jest już zaksięgowana i
+  // nieodwracalna, więc błąd wysyłki nie może cofnąć statusu „paid" ani zwrócić
+  // webhookowi błędu (operator uznałby płatność za nieprzetworzoną). Token już
+  // istnieje — odzyskanie linku odbywa się przez „wyślij ponownie". Logujemy,
+  // aby awaria była widoczna.
+  try {
+    await sendDownloadEmail(order, token);
+  } catch (error) {
+    console.error(
+      "Błąd wysyłki e-maila z linkiem (zamówienie pozostaje opłacone):",
+      error,
+    );
+  }
 }

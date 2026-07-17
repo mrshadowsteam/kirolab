@@ -22,10 +22,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nieprawidłowy status." }, { status: 400 });
   }
 
-  await prisma.lead.update({
-    where: { id: body.id },
-    data: { status: body.status },
-  });
+  try {
+    await prisma.lead.update({
+      where: { id: body.id },
+      data: { status: body.status },
+    });
+  } catch {
+    return NextResponse.json({ error: "Nie znaleziono leada." }, { status: 404 });
+  }
 
   return NextResponse.json({ ok: true });
 }
